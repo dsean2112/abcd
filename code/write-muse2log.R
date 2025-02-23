@@ -13,6 +13,8 @@ library(dplyr)
 library(vroom)
 library(readr)
 library(foreach)
+library(parallelly)
+library(tools)
 
 # Paths
 home <- fs::path('/mmfs1','projects','cardio_darbar_chi') # correcting path due to strange link functioning
@@ -20,7 +22,7 @@ main <- fs::path("common") # correcting path
 muse <- fs::path(home, main, "data", "muse")
 
 # Setup parallelization
-nCPU <- parallel::detectCores()
+nCPU <- parallelly::availableCores()
 doParallel::registerDoParallel(cores = nCPU)
 cat("Attempt parallelization with", nCPU, "cores\n")
 
@@ -32,8 +34,15 @@ museList <-
 	list.files(path = muse, pattern = '\\.xml$', full.names = TRUE, recursive = TRUE, include.dirs = TRUE) |> # changed command to list files due to error
 	na.omit() |>
 	unique()
-n <- length(museList)
 
+# Update log
+if (file.exists(logFile)) {
+	old_log <- read.csv(fs::path(muse,'muse.log')) # Load old muse.log file
+	museList <- museList[!file_path_sans_ext(museList) %in% fs::path(home,main,old_log$PATH)] # remove file names which are already in the log
+	true_false <- FALSE
+	} else {true_false <- TRUE} # set t/f value for header names. If file exists, do not add header line
+
+n <- length(museList)
 cat("Expect to write out", n, "files\n")
 out <-
 	foreach(i = 1:n,
@@ -57,14 +66,15 @@ out <-
 					}
 
 # Write out the file
+
 out |>
 	as.data.frame() |>
 	dplyr::distinct() |>
 	vroom::vroom_write(
 		file = logFile,
 		delim = ",",
-		col_names = TRUE,
-		append = FALSE
+		col_names = true_false,
+		append = TRUE # allow existing file to be updated
 	)
 
 cat("\tCompleted writing", n, "MUSE_IDs and paths to log file\n")
