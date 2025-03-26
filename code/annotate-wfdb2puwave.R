@@ -10,13 +10,14 @@
 cat("Setup for annotation of WFDB files:\n\n")
 
 # Libraries
-library(shiva)
+library(EGM)
 library(fs)
 library(dplyr)
 library(vroom)
 library(foreach)
-library(parallel)
+library(parallelly)
 library(doParallel)
+options(wfdb_path = '/mmfs1/home/dseaney2/wfdb/bin') # can also add 'source $HOME/.bashrc' to .sh file before R script 
 
 # Arguments
 # 	1st = SLURM_ARRAY_JOB_ID
@@ -27,14 +28,14 @@ taskCount <- as.integer(args[2]) # Total array jobs will be the number of nodes
 cat("\tBatch array job number", taskNumber, "out of", taskCount, "array jobs total\n")
 
 # Setup parallelization
-nCPU <- parallel::detectCores()
+nCPU <- parallelly::availableCores()
 doParallel::registerDoParallel(cores = nCPU)
 cat("\tAttempting parallelization with", nCPU, "cores\n")
 
 # Paths
-home <- fs::path_expand("~")
-main <- fs::path("projects", "cbcd")
-wfdb <- fs::path(home, main, "data", "wfdb")
+home <- fs::path('/mmfs1/projects/cardio_darbar_chi/common/data')
+# main <- fs::path("data")
+wfdb <- fs::path(home, "wfdb")
 
 # Batch Preparation ----
 
@@ -99,7 +100,7 @@ annotatedFiles <-
 			fd <- fs::path_dir(fp)
 			year <- fs::path_split(fd)[[1]] |> dplyr::last()
 
-			shiva::detect_surface_beats(
+			EGM::read_annotation(
 				record = fn,
 				record_dir = fd,
 				detector = "ecgpuwave"
