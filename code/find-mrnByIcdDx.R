@@ -38,14 +38,14 @@ library(dplyr)
 library(fs)
 library(tibble)
 library(vroom)
-library(parallel)
+library(parallelly)
 library(foreach)
 
 # Paths
 # 	home = common project folder for software and data
 # 	project = where the MRN list is held
 # 	uic = where clinical data is held from the CDW/CCTS
-home <- fs::path("/", "shared", "projects", "cardio_darbar", "common")
+home <- fs::path("/", "mmfs1", "projects", "cardio_darbar_chi", "common")
 project <- fs::path(home, "software", "abcd")
 uic <- fs::path(home, "data", "uic", "cdw")
 
@@ -65,7 +65,7 @@ cat('\tBatch array job number:', taskNumber, '\n')
 cat('\tTotal number of array jobs:', taskCount, '\n')
 
 # Parallel...
-nCPU <- parallel::detectCores()
+nCPU <- parallelly::availableCores()
 doParallel::registerDoParallel(cores = nCPU)
 cat('Attempt parallelization with', nCPU, 'cores\n')
 
