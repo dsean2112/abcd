@@ -23,10 +23,10 @@ library(vroom)
 library(fs)
 
 # Paths
-home <- fs::path_expand('~')
-raw_path <- fs::path(home, 'ccts', 'emr', 'raw')
-csv_path <- fs::path(home, 'ccts', 'emr', 'csv')
-project <- fs::path('projects', 'cbcd')
+home <- fs::path('/mmfs1/projects/cardio_darbar_chi/common/data/')
+raw_path <- fs::path(home, 'raw_clinical_data')
+csv_path <- fs::path(home, 'csv')
+#project <- fs::path('projects', 'cbcd')
 
 # Demographics
 # 	Do not need to split these actually
