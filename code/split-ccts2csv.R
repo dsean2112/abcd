@@ -24,7 +24,7 @@ library(fs)
 
 # Paths
 home <- fs::path('/mmfs1/projects/cardio_darbar_chi/common/data/')
-raw_path <- fs::path(home, 'raw_clinical_data')
+raw_path <- fs::path(home, 'raw')
 csv_path <- fs::path(home, 'csv')
 #project <- fs::path('projects', 'cbcd')
 
